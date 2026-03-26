@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Codiv Finance | Admin & Staff</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f0f2f9;
+  --surface: #ffffff;
+  --surface2: #f6f7fc;
+  --surface3: #eceef6;
+  --glass: rgba(255,255,255,0.72);
+  --glass-border: rgba(255,255,255,0.35);
+  --border: #e2e6f2;
+  --border2: #d1d6e8;
+  --text: #0b0f1e;
+  --text2: #3d4463;
+  --text3: #8990ad;
+  --accent: #4f46e5;
+  --accent2: #7c3aed;
+  --accent3: #3b82f6;
+  --accent-light: #eef2ff;
+  --accent-glow: rgba(79,70,229,0.15);
+  --emerald: #059669;
+  --emerald2: #10b981;
+  --emerald-light: #ecfdf5;
+  --red: #dc2626;
+  --red2: #f43f5e;
+  --red-light: #fef2f2;
+  --amber: #d97706;
+  --amber-light: #fffbeb;
+  --shadow-sm: 0 2px 8px rgba(79,70,229,0.06),0 1px 3px rgba(0,0,0,0.04);
+  --shadow: 0 4px 24px rgba(79,70,229,0.08),0 1px 8px rgba(0,0,0,0.03);
+  --shadow-lg: 0 20px 60px rgba(79,70,229,0.12),0 6px 20px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 7px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+  --bounce: 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,h5{font-family:'Space Grotesk',sans-serif;font-weight:700}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:none}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── LAYOUT ── */
+.app-shell{display:flex;min-height:100vh}
+.sidebar{width:270px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-right:1px solid var(--glass-border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:200;transition:transform var(--transition);box-shadow:4px 0 24px rgba(79,70,229,0.04)}
+.sidebar-hidden{transform:translateX(-100%)}
+.main-content{flex:1;margin-left:270px;min-height:100vh;transition:margin var(--transition)}
+.main-content.full{margin-left:0}
+
+/* Topbar */
+.topbar{height:72px;background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--glass-border);display:flex;align-items:center;padding:0 28px;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(79,70,229,0.04)}
+.page{display:none;padding:32px 28px;animation:fadeUp 0.4s ease}
+.page.active{display:block}
+
+/* Brand */
+.brand{padding:24px 20px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.brand-logo{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:20px;box-shadow:0 8px 24px rgba(79,70,229,0.3);animation:float 3s ease-in-out infinite}
+.brand-name{font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:22px;color:var(--text);letter-spacing:-0.5px}
+.brand-sub{font-size:11px;color:var(--text3);font-weight:700;letter-spacing:1px;text-transform:uppercase}
+
+/* Nav */
+.nav{flex:1;padding:16px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:12px;cursor:pointer;color:var(--text2);font-weight:600;font-size:14px;transition:all var(--transition);position:relative}
+.nav-item:hover{background:var(--surface2);color:var(--text);transform:translateX(4px)}
+.nav-item.active{background:linear-gradient(135deg,var(--accent-light),rgba(124,58,237,0.06));color:var(--accent);font-weight:700;box-shadow:var(--shadow-sm)}
+.nav-item.active::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:4px;height:22px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:2px}
+.nav-icon{width:18px;height:18px;opacity:.65}
+.nav-item.active .nav-icon{opacity:1}
+.nav-section{font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--text3);padding:16px 16px 6px;text-transform:uppercase}
+
+/* Sidebar footer */
+.sidebar-footer{padding:16px 12px;border-top:1px solid var(--border)}
+.clock-widget{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:14px;padding:16px;margin-bottom:12px;color:#fff;position:relative;overflow:hidden}
+.clock-widget::before{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.08)}
+.clock-time{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1}
+.clock-date{font-size:12px;opacity:.8;margin-top:6px;font-weight:500}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all var(--transition);text-decoration:none;justify-content:center;font-family:inherit;letter-spacing:0.3px;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);opacity:0;transition:opacity var(--transition)}
+.btn:hover::after{opacity:1}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 6px 20px rgba(79,70,229,0.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(79,70,229,0.4)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1.5px solid var(--border)}
+.btn-secondary:hover{background:var(--surface3);border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;box-shadow:0 4px 14px rgba(220,38,38,0.25)}
+.btn-danger:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(220,38,38,0.3)}
+.btn-ghost{background:transparent;color:var(--text2);padding:10px 16px}
+.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-sm{padding:7px 13px;font-size:13px;border-radius:var(--radius-xs)}
+.btn-icon{padding:9px;border-radius:var(--radius-sm);background:var(--surface2);cursor:pointer;border:none;display:inline-flex;transition:all var(--transition)}
+.btn-icon:hover{background:var(--surface3)}
+
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px}
+.hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:all var(--transition)}
+
+.topbar-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;flex:1;display:flex;align-items:center;letter-spacing:-0.3px}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);transition:all var(--transition)}
+.card:hover{box-shadow:var(--shadow);border-color:rgba(79,70,229,0.12)}
+.card-lg{border-radius:var(--radius-lg)}
+
+/* Grids */
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+
+/* Stat cards */
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;transition:all var(--transition);cursor:default}
+.stat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.stat-card .bg-blob{position:absolute;right:-25px;top:-25px;width:100px;height:100px;border-radius:50%;opacity:.06;transition:opacity var(--transition)}
+.stat-card:hover .bg-blob{opacity:.1}
+.stat-card.blue .bg-blob{background:var(--accent)}
+.stat-card.green .bg-blob{background:var(--emerald)}
+.stat-card.red .bg-blob{background:var(--red)}
+.stat-card.amber .bg-blob{background:var(--amber)}
+.stat-label{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px}
+.stat-value{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-0.5px}
+.stat-change{font-size:12px;font-weight:700;margin-top:10px;display:flex;align-items:center;gap:4px}
+.stat-change.up{color:var(--emerald)}
+.stat-change.down{color:var(--red)}
+.stat-icon-box{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:20px;transition:transform var(--transition)}
+.stat-card:hover .stat-icon-box{transform:scale(1.1) rotate(-5deg)}
+.stat-icon-box.blue{background:var(--accent-light);color:var(--accent)}
+.stat-icon-box.green{background:var(--emerald-light);color:var(--emerald)}
+.stat-icon-box.red{background:var(--red-light);color:var(--red)}
+.stat-icon-box.amber{background:var(--amber-light);color:var(--amber)}
+
+/* Forms */
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px;letter-spacing:0.2px}
+.form-input{width:100%;padding:11px 16px;border:2px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;color:var(--text);background:var(--surface);transition:all var(--transition);outline:none;font-weight:500}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-glow);background:#fff}
+.form-input::placeholder{color:var(--text3);font-weight:400}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239aa0b4' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-section{background:var(--surface2);border-radius:14px;padding:20px;margin-bottom:20px;border:1px solid var(--border)}
+.form-section-title{font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px}
+
+/* Tables */
+.table-wrap{overflow-x:auto;border-radius:var(--radius-sm);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead{background:var(--surface2)}
+th{padding:13px 18px;text-align:left;font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:14px 18px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:all var(--transition)}
+tbody tr:hover{background:var(--accent-light)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.badge-green{background:var(--emerald-light);color:var(--emerald)}
+.badge-red{background:var(--red-light);color:var(--red)}
+.badge-blue{background:var(--accent-light);color:var(--accent)}
+.badge-amber{background:var(--amber-light);color:var(--amber)}
+
+/* Modals */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius-lg);padding:32px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:scaleIn .3s var(--bounce);position:relative}
+.modal-title{font-size:22px;margin-bottom:6px;letter-spacing:-0.3px}
+.modal-sub{font-size:14px;color:var(--text2);margin-bottom:24px}
+.modal-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition);font-size:16px;color:var(--text3)}
+.modal-close:hover{background:var(--red-light);color:var(--red);border-color:var(--red);transform:rotate(90deg)}
+
+/* Auth */
+.auth-bg{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden;background:linear-gradient(145deg,#e8ecfa 0%,#f0f2f9 35%,#ede9fe 65%,#ecfdf5 100%)}
+.auth-bg::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(79,70,229,0.06) 0%,transparent 70%);top:-200px;right:-100px;pointer-events:none}
+.auth-bg::after{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(16,185,129,0.05) 0%,transparent 70%);bottom:-150px;left:-100px;pointer-events:none}
+.auth-card{background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:var(--radius-xl);padding:48px 44px;width:100%;max-width:480px;box-shadow:var(--shadow-lg);animation:scaleIn 0.5s var(--bounce)}
+.auth-brand{text-align:center;margin-bottom:36px}
+.auth-logo{width:64px;height:64px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:18px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:26px;margin:0 auto 16px;box-shadow:0 12px 32px rgba(79,70,229,0.3);animation:float 3s ease-in-out infinite}
+.auth-tabs{display:flex;background:var(--surface2);border-radius:12px;padding:5px;margin-bottom:30px;border:1px solid var(--border)}
+.auth-tab{flex:1;padding:10px;text-align:center;border-radius:9px;cursor:pointer;font-weight:700;font-size:14px;color:var(--text3);transition:all var(--transition)}
+.auth-tab.active{color:var(--accent);background:var(--surface);box-shadow:var(--shadow-sm)}
+.avatar-upload{width:88px;height:88px;border-radius:50%;background:var(--surface2);border:2.5px dashed var(--border2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;overflow:hidden;transition:all var(--transition)}
+.avatar-upload:hover{border-color:var(--accent);background:var(--accent-light);transform:scale(1.05)}
+.avatar-upload img{width:100%;height:100%;object-fit:cover}
+
+/* Profile hero */
+.profile-hero{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--radius-lg);padding:32px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden}
+.profile-hero::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06)}
+.profile-hero::after{content:'';position:absolute;right:60px;bottom:-60px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.04)}
+.profile-avatar{width:72px;height:72px;border-radius:50%;border:3px solid rgba(255,255,255,.3);margin-bottom:16px;object-fit:cover;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;font-family:'Space Grotesk',sans-serif}
+.profile-name{font-size:24px;font-weight:800;margin-bottom:4px}
+.profile-role-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:700}
+
+/* Chart cards */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);transition:all var(--transition)}
+.chart-card:hover{box-shadow:var(--shadow);border-color:rgba(79,70,229,0.12)}
+.chart-title{font-size:17px;font-weight:700;margin-bottom:4px}
+.chart-sub{font-size:12px;color:var(--text3);margin-bottom:20px;font-weight:500}
+
+/* Person cards */
+.person-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:16px;transition:all var(--transition);cursor:default}
+.person-card:hover{box-shadow:var(--shadow);border-color:rgba(79,70,229,0.15);transform:translateY(-2px)}
+.person-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;font-family:'Space Grotesk',sans-serif;flex-shrink:0;overflow:hidden;box-shadow:0 4px 12px rgba(79,70,229,0.2)}
+.person-info{flex:1;min-width:0}
+.person-name{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.person-contact{font-size:13px;color:var(--text3);margin-top:3px}
+
+/* Progress bar */
+.progress-bar{height:8px;background:var(--surface2);border-radius:100px;overflow:hidden;margin-top:10px;border:1px solid var(--border)}
+.progress-fill{height:100%;border-radius:100px;transition:width .6s ease}
+
+/* Toast */
+.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;max-width:380px}
+.toast{padding:14px 20px;border-radius:14px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:12px;pointer-events:auto;animation:slideDown 0.4s var(--bounce);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.2);box-shadow:var(--shadow-lg)}
+.toast.success{background:linear-gradient(135deg,rgba(5,150,105,0.92),rgba(16,185,129,0.92));color:#fff}
+.toast.error{background:linear-gradient(135deg,rgba(220,38,38,0.92),rgba(244,63,94,0.92));color:#fff}
+.toast.info{background:linear-gradient(135deg,rgba(79,70,229,0.92),rgba(124,58,237,0.92));color:#fff}
+
+.page-header{margin-bottom:28px}
+.page-title{font-size:28px;margin-bottom:6px;letter-spacing:-0.5px}
+.page-sub{font-size:14px;color:var(--text2);font-weight:500}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3);background:var(--surface);border-radius:var(--radius);border:2px dashed var(--border)}
+.empty-icon{font-size:48px;margin-bottom:16px;animation:float 3s ease-in-out infinite}
+.divider{height:1px;background:var(--border);margin:24px 0}
+
+.overlay-sidebar{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(2px);z-index:199}
+
+.admin-only{display:none !important}
+body.is-admin div.admin-only{display:block !important}
+body.is-admin button.admin-only,body.is-admin .btn.admin-only{display:inline-flex !important}
+.admin-nav-item{display:none !important}
+body.is-admin .admin-nav-item{display:flex !important}
+
+@media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.mobile-open{transform:none}
+  .main-content{margin-left:0}
+  .hamburger{display:flex}
+  .overlay-sidebar.active{display:block}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .page{padding:20px 16px}
+  .topbar{padding:0 16px;height:64px}
+  .page-title{font-size:22px}
+  .stat-value{font-size:24px}
+  th,td{padding:10px 12px;font-size:13px}
+  .auth-card{padding:32px 24px}
+}
+@media(min-width:701px){.hamburger{display:none!important}}
+@media(max-width:400px){
+  .page{padding:16px 12px}
+  .card,.chart-card,.stat-card{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+<div class="overlay-sidebar" id="overlaySidebar" onclick="closeSidebar()"></div>
+
+<!-- AUTH -->
+<div id="authScreen" class="auth-bg">
+<div class="auth-card">
+  <div class="auth-brand">
+    <div class="auth-logo">C</div>
+    <h2 style="font-size:26px;letter-spacing:-0.5px">Codiv Finance</h2>
+    <p style="font-size:14px;color:var(--text3);margin-top:6px;font-weight:500">Admin & Staff Portal</p>
+  </div>
+  <div class="auth-tabs">
+    <div class="auth-tab active" onclick="switchAuthTab('login')">Sign In</div>
+    <div class="auth-tab" onclick="switchAuthTab('register')">Create Account</div>
+  </div>
+  <div id="loginForm">
+    <div class="form-group"><label class="form-label">📧 Email or Username</label><input class="form-input" id="loginEmail" type="text" placeholder="Enter email or username"/></div>
+    <div class="form-group"><label class="form-label">🔐 Password</label><input class="form-input" id="loginPassword" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:20px"><span style="font-size:13px;color:var(--accent);cursor:pointer;font-weight:700" onclick="showForgotPassword()">Forgot password?</span></div>
+    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Sign In Securely</button>
+  </div>
+  <div id="forgotForm" style="display:none">
+    <p style="font-size:14px;color:var(--text2);margin-bottom:20px">Enter your email and we'll send a reset link.</p>
+    <div class="form-group"><label class="form-label">📧 Email</label><input class="form-input" id="resetEmail" type="email" placeholder="your@email.com"/></div>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:12px" onclick="doResetPassword()">Send Reset Link</button>
+    <button class="btn btn-secondary" style="width:100%" onclick="showLogin()">← Back to Sign In</button>
+  </div>
+  <div id="registerForm" style="display:none">
+    <div style="text-align:center;margin-bottom:20px">
+      <div class="avatar-upload" id="avatarUpload" onclick="document.getElementById('avatarInput').click()">
+        <img id="avatarPreview" style="display:none"/>
+        <div id="avatarPlaceholder"><div style="font-size:24px">📷</div><div style="font-size:10px;color:var(--text3);font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-top:4px">Photo *</div></div>
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="previewAvatar(event)"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">👤 Full Name</label><input class="form-input" id="regName" type="text" placeholder="John Doe"/></div>
+      <div class="form-group"><label class="form-label">🏷️ Username</label><input class="form-input" id="regUsername" type="text" placeholder="johndoe"/></div>
+    </div>
+    <div class="form-group"><label class="form-label">📧 Email</label><input class="form-input" id="regEmail" type="email" placeholder="john@example.com"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">🔐 Password</label><input class="form-input" id="regPassword" type="password" placeholder="Min 6 chars"/></div>
+      <div class="form-group"><label class="form-label">✅ Confirm</label><input class="form-input" id="regConfirm" type="password" placeholder="Repeat"/></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="doRegister()">Create Account</button>
+  </div>
+</div>
+</div>
+
+<!-- APP -->
+<div id="appShell" class="app-shell" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-logo">C</div>
+      <div><div class="brand-name">Codiv</div><div class="brand-sub">FINANCE</div></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item active" onclick="navigate('dashboard')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" onclick="navigate('statistics')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Statistics
+      </div>
+      <div class="nav-section">Transactions</div>
+      <div class="nav-item" onclick="navigate('persons')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Persons
+      </div>
+      <div class="nav-item" onclick="navigate('transactions')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Transactions
+      </div>
+      <div class="nav-item" onclick="navigate('business')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        Business
+      </div>
+      <div class="nav-section">Account</div>
+      <div class="nav-item" onclick="navigate('profile')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </div>
+      <div class="nav-item" onclick="navigate('users')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+        System Users
+      </div>
+      <div class="nav-item admin-nav-item" onclick="navigate('admin')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Admin Panel
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="clock-widget">
+        <div class="clock-time" id="clockTime">00:00</div>
+        <div class="clock-date" id="clockDate">Loading...</div>
+      </div>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center" onclick="doLogout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content" id="mainContent">
+    <div class="topbar">
+      <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-actions" id="topbarActions"></div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Good morning, <span id="greetName">User</span> 👋</h1>
+        <p class="page-sub">Here's your financial overview for today</p>
+      </div>
+      <div class="grid-4" style="margin-bottom:24px">
+        <div class="stat-card green"><div class="bg-blob"></div><div class="stat-icon-box green">📥</div><div class="stat-label">Received from Clients</div><div class="stat-value" id="statReceived">₹0</div><div class="stat-change up">Total client payments</div></div>
+        <div class="stat-card amber"><div class="bg-blob"></div><div class="stat-icon-box amber">🎯</div><div class="stat-label">Payback Due</div><div class="stat-value" id="statPaybackDue">₹0</div><div class="stat-change" style="color:var(--amber)">Each payment + ₹200</div></div>
+        <div class="stat-card blue"><div class="bg-blob"></div><div class="stat-icon-box blue">📤</div><div class="stat-label">Already Sent Back</div><div class="stat-value" id="statSentBack">₹0</div><div class="stat-change up">Returned to clients</div></div>
+        <div class="stat-card red"><div class="bg-blob"></div><div class="stat-icon-box red">⏳</div><div class="stat-label">Pending Payback</div><div class="stat-value" id="statPending">₹0</div><div class="stat-change down" id="statPendingChg">Still owe clients</div></div>
+      </div>
+      <div class="grid-4" style="margin-bottom:24px">
+        <div class="stat-card blue"><div class="bg-blob"></div><div class="stat-icon-box blue">💼</div><div class="stat-label">Total Invested</div><div class="stat-value" id="statInvested">₹0</div><div class="stat-change" style="color:var(--accent)">Business capital</div></div>
+        <div class="stat-card green"><div class="bg-blob"></div><div class="stat-icon-box green">📈</div><div class="stat-label">Total Profit</div><div class="stat-value" id="statProfit">₹0</div><div class="stat-change up">From investments</div></div>
+        <div class="stat-card red"><div class="bg-blob"></div><div class="stat-icon-box red">📉</div><div class="stat-label">Total Loss</div><div class="stat-value" id="statLoss">₹0</div><div class="stat-change down">From investments</div></div>
+        <div class="stat-card amber"><div class="bg-blob"></div><div class="stat-icon-box amber">📊</div><div class="stat-label">Net P&L</div><div class="stat-value" id="statPnl">₹0</div><div class="stat-change" id="statPnlChg">—</div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:24px">
+        <div class="chart-card"><div class="chart-title">Cash Flow (Last 7 Days)</div><div class="chart-sub">Daily received vs sent back</div><div style="height:220px"><canvas id="dashFlowChart"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Recent Transactions</div><div class="chart-sub">Latest activity</div><div id="recentTxList" style="margin-top:4px"></div></div>
+      </div>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="page" id="page-statistics">
+      <div class="page-header"><h1 class="page-title">Analytics & Statistics</h1><p class="page-sub">Investment intelligence & risk analysis</p></div>
+      <div class="grid-4" style="margin-bottom:24px" id="statsCards"></div>
+      <div class="grid-2" style="margin-bottom:24px">
+        <div class="chart-card"><div class="chart-title">Client Payments vs Paybacks</div><div class="chart-sub">Monthly comparison</div><div style="height:260px"><canvas id="revenueChart"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Financial Breakdown</div><div class="chart-sub">Where money flows</div><div style="height:260px"><canvas id="portfolioChart"></canvas></div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:24px">
+        <div class="chart-card"><div class="chart-title">Investment Performance</div><div class="chart-sub">Cumulative ROI over time (%)</div><div style="height:220px"><canvas id="investChart"></canvas></div></div>
+        <div class="chart-card"><div class="chart-title">Transaction Volume</div><div class="chart-sub">Daily volume (7 days)</div><div style="height:220px"><canvas id="volumeChart"></canvas></div></div>
+      </div>
+      <div class="card card-lg" style="margin-bottom:24px">
+        <h3 style="margin-bottom:20px;font-size:18px">⚡ Investment Risk Intelligence</h3>
+        <div class="grid-3">
+          <div style="text-align:center;padding:20px"><canvas id="riskGauge" width="200" height="110"></canvas><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;margin-top:8px" id="riskScore">—</div><div style="font-size:12px;color:var(--text3)">Overall Investment Risk</div></div>
+          <div><h4 style="font-size:14px;margin-bottom:16px;color:var(--text2)">Risk Breakdown</h4><div id="riskBreakdown"></div></div>
+          <div><h4 style="font-size:14px;margin-bottom:16px;color:var(--text2)">Risk Indicators</h4><div id="riskIndicators"></div></div>
+        </div>
+      </div>
+      <div class="chart-card"><div class="chart-title">Profit & Loss Waterfall</div><div class="chart-sub">Investment flow analysis</div><div style="height:260px"><canvas id="waterfallChart"></canvas></div></div>
+    </div>
+
+    <!-- PERSONS -->
+    <div class="page" id="page-persons">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div><h1 class="page-title">Persons</h1><p class="page-sub">Manage contacts for transactions</p></div>
+        <button class="btn btn-primary admin-only" onclick="openAddPerson()">+ Add Person</button>
+      </div>
+      <div class="grid-3" id="personGrid"><div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👤</div><p>No persons added yet</p></div></div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="page" id="page-transactions">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div><h1 class="page-title">Transactions</h1><p class="page-sub">Record payments received from clients & paybacks sent</p></div>
+        <button class="btn btn-primary admin-only" onclick="openAddTx()">+ New Transaction</button>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Date & Time</th><th>Person</th><th>Type</th><th>Amount</th><th>Note</th><th>Receipt</th><th>Actions</th></tr></thead><tbody id="txTableBody"></tbody></table></div>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="page" id="page-business">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div><h1 class="page-title">Business Transactions</h1><p class="page-sub">Track investments, profits & losses</p></div>
+        <button class="btn btn-primary admin-only" onclick="openAddBusiness()">+ New Entry</button>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Date & Time</th><th>Invested</th><th>P&L</th><th>Type</th><th>Investor</th><th>Note</th><th>Actions</th></tr></thead><tbody id="bizTableBody"></tbody></table></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="page" id="page-profile">
+      <div class="profile-hero">
+        <div class="profile-avatar" id="profileAvatarHero">U</div>
+        <div class="profile-name" id="profileHeroName">User Name</div>
+        <div style="font-size:14px;opacity:.8;margin-bottom:12px" id="profileHeroEmail">user@email.com</div>
+        <span class="profile-role-badge" id="profileHeroBadge">🔵 User</span>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom:20px;font-size:17px">Account Details</h3>
+          <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="pfName" placeholder="Full Name"/></div>
+          <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="pfUsername" placeholder="Username"/></div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="pfEmail" type="email" placeholder="Email"/></div>
+          <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:20px">
+            <h3 style="margin-bottom:20px;font-size:17px">Profile Photo</h3>
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;background:var(--surface2);flex-shrink:0"><img id="pfAvatarImg" style="width:100%;height:100%;object-fit:cover;display:none"/><div id="pfAvatarInitial" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;font-family:'Space Grotesk',sans-serif;color:var(--accent)">U</div></div>
+              <div><button class="btn btn-secondary btn-sm" onclick="document.getElementById('pfAvatarInput').click()">Change Photo</button><input type="file" id="pfAvatarInput" accept="image/*" style="display:none" onchange="updateProfilePhoto(event)"/><p style="font-size:12px;color:var(--text3);margin-top:6px">JPG, PNG. Max 5MB.</p></div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:20px">
+            <h3 style="margin-bottom:20px;font-size:17px">Security</h3>
+            <div class="form-group"><label class="form-label">New Password</label><input class="form-input" id="pfNewPass" type="password" placeholder="New password"/></div>
+            <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" id="pfConfPass" type="password" placeholder="Confirm password"/></div>
+            <button class="btn btn-secondary" onclick="changePassword()">Update Password</button>
+          </div>
+          <div class="card"><h3 style="margin-bottom:16px;font-size:17px">Account Stats</h3><div id="profileStats" style="display:flex;flex-direction:column;gap:12px"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="page" id="page-users">
+      <div class="page-header"><h1 class="page-title">System Users</h1><p class="page-sub">Directory of all registered accounts</p></div>
+      <div class="grid-3" id="usersDirectoryGrid"><div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">⏳</div><p>Loading users...</p></div></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="page admin-only" id="page-admin">
+      <div class="page-header"><h1 class="page-title">🛡️ Admin Panel</h1><p class="page-sub">System administration — restricted access</p></div>
+      <div class="grid-2" style="margin-bottom:24px">
+        <div class="card"><h3 style="margin-bottom:16px">All Users</h3><div id="adminUserList"></div></div>
+        <div class="card"><h3 style="margin-bottom:16px">All Admins</h3><div id="adminAdminList"></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modalPerson"><div class="modal"><button class="modal-close" onclick="closeModal('modalPerson')">✕</button><div class="modal-title">Add Person</div><div class="modal-sub">Add a contact for transactions</div>
+  <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="pName" placeholder="John Doe"/></div>
+  <div class="form-group"><label class="form-label">Phone / Contact *</label><input class="form-input" id="pContact" placeholder="+91 98765 43210"/></div>
+  <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="pEmail" type="email" placeholder="optional"/></div>
+  <div class="form-group"><label class="form-label">Note</label><input class="form-input" id="pNote" placeholder="Optional note"/></div>
+  <button class="btn btn-primary" style="width:100%" onclick="savePerson()">Add Person</button>
+</div></div>
+
+<div class="modal-overlay" id="modalTx"><div class="modal"><button class="modal-close" onclick="closeModal('modalTx')">✕</button><div class="modal-title" id="txModalTitle">New Transaction</div><div class="modal-sub">Record a financial transaction</div>
+  <div class="form-section"><div class="form-section-title">Transaction Details</div>
+    <div class="form-group"><label class="form-label">Type *</label><select class="form-input form-select" id="txType"><option value="received">📥 Received (Client paid you)</option><option value="sent">📤 Sent (Payback to client)</option></select></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Amount (₹) *</label><input class="form-input" id="txAmount" type="number" placeholder="0.00" min="0"/></div><div class="form-group"><label class="form-label">Person *</label><select class="form-input form-select" id="txPerson"></select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Date *</label><input class="form-input" id="txDate" type="date"/></div><div class="form-group"><label class="form-label">Time *</label><input class="form-input" id="txTime" type="time"/></div></div>
+    <div class="form-group"><label class="form-label">Receipt / Screenshot</label><input type="file" id="txScreenshotInput" class="form-input" accept="image/*" onchange="previewTxScreenshot(event)" style="padding:8px 14px"/><img id="txScreenshotPreview" style="display:none;width:100%;max-height:160px;object-fit:contain;margin-top:12px;border-radius:var(--radius-sm);border:1px dashed var(--border);padding:4px"/></div>
+    <div class="form-group"><label class="form-label">Note</label><input class="form-input" id="txNote" placeholder="Optional note"/></div>
+  </div>
+  <button class="btn btn-primary" id="txSaveBtn" style="width:100%" onclick="saveTx()">Save Transaction</button>
+</div></div>
+
+<div class="modal-overlay" id="modalBiz"><div class="modal"><button class="modal-close" onclick="closeModal('modalBiz')">✕</button><div class="modal-title" id="bizModalTitle">Business Transaction</div><div class="modal-sub">Record investment and P&L</div>
+  <div class="form-section"><div class="form-section-title">Investment Details</div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Invested Amount (₹) *</label><input class="form-input" id="bizInvested" type="number" placeholder="0.00" min="0"/></div><div class="form-group"><label class="form-label">P&L Type *</label><select class="form-input form-select" id="bizPnlType"><option value="profit">📈 Profit</option><option value="loss">📉 Loss</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">P&L Amount (₹) *</label><input class="form-input" id="bizPnl" type="number" placeholder="0.00" min="0"/></div><div class="form-group"><label class="form-label">Investor</label><input class="form-input" id="bizInvestor" placeholder="Auto-filled" readonly/></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Date *</label><input class="form-input" id="bizDate" type="date"/></div><div class="form-group"><label class="form-label">Time *</label><input class="form-input" id="bizTime" type="time"/></div></div>
+    <div class="form-group"><label class="form-label">Note</label><input class="form-input" id="bizNote" placeholder="Optional note"/></div>
+  </div>
+  <button class="btn btn-primary" style="width:100%" onclick="saveBiz()">Save Entry</button>
+</div></div>
+
+<div class="modal-overlay" id="modalUserProfile"><div class="modal"><button class="modal-close" onclick="closeModal('modalUserProfile')">✕</button><div id="userProfileHeader" style="display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)"></div><div id="userProfileBody"></div></div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updatePassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDatabase, ref, set, get, push, remove, update, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig={apiKey:"AIzaSyDhZb109hwM7lklWkJkc0BoBPnt499TjYg",authDomain:"web-finance-e1af7.firebaseapp.com",projectId:"web-finance-e1af7",storageBucket:"web-finance-e1af7.firebasestorage.app",messagingSenderId:"364480969041",appId:"1:364480969041:web:03d1d90c14ae10731f3b70",measurementId:"G-D1KP9LH78E",databaseURL:"https://web-finance-e1af7-default-rtdb.firebaseio.com"};
+const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getDatabase(app);
+const SUPER_ADMIN="mohitk43131@gmail.com";
+let currentUser=null,isAdmin=false,isSuperAdmin=false,rawPersons={},persons={},transactions={},businessTx={},allUsers={},editingTxKey=null,editingBizKey=null,editingPersonKey=null;
+
+function updateClock(){const now=new Date();const el=document.getElementById('clockTime');if(el)el.textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const dateEl=document.getElementById('clockDate');if(dateEl)dateEl.textContent=`${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`}
+setInterval(updateClock,1000);updateClock();
+
+window.showToast=function(msg,type='info',duration=4000){const c=document.getElementById('toastContainer');const icons={success:'✅',error:'❌',info:'ℹ️'};const t=document.createElement('div');t.className=`toast ${type}`;t.innerHTML=`<span style="font-size:18px;flex-shrink:0">${icons[type]||'ℹ️'}</span><span>${msg}</span><span style="margin-left:auto;cursor:pointer;opacity:.7;font-size:16px" onclick="this.parentElement.remove()">✕</span>`;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='0.3s ease';setTimeout(()=>t.remove(),300)},duration)};
+window.fmtNum=function(n){n=Number(n)||0;if(n>=10000000)return(n/10000000).toFixed(2)+'Cr';if(n>=100000)return(n/100000).toFixed(2)+'L';if(n>=1000)return(n/1000).toFixed(1)+'K';return n.toFixed(2)};
+function compressImage(base64Data,maxWidth=800,quality=0.7){return new Promise(resolve=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');let w=img.width,h=img.height;if(w>maxWidth){h=Math.round(h*maxWidth/w);w=maxWidth}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);resolve(canvas.toDataURL('image/jpeg',quality))};img.onerror=()=>resolve(base64Data);img.src=base64Data.startsWith('data:')?base64Data:`data:image/jpeg;base64,${base64Data}`})}
+
+// Auth state
+onAuthStateChanged(auth,async user=>{if(user){currentUser=user;const snap=await get(ref(db,`users/${user.uid}`));const data=snap.val()||{};if(data.role==='client'){await signOut(auth);currentUser=null;showAuth();setTimeout(()=>showToast('Access restricted. Clients use the Client Portal.','error'),500);return}isAdmin=data.role==='admin'||data.role==='superadmin'||user.email===SUPER_ADMIN;isSuperAdmin=user.email===SUPER_ADMIN;if(user.email===SUPER_ADMIN&&data.role!=='superadmin'){await set(ref(db,`users/${user.uid}/role`),'superadmin');isAdmin=true;isSuperAdmin=true}showApp(data)}else{currentUser=null;isAdmin=false;showAuth()}});
+
+function showAuth(){document.getElementById('authScreen').style.display='flex';document.getElementById('appShell').style.display='none'}
+function showApp(data){document.getElementById('authScreen').style.display='none';document.getElementById('appShell').style.display='flex';if(isAdmin)document.body.classList.add('is-admin');else document.body.classList.remove('is-admin');const name=data.name||currentUser.displayName||currentUser.email.split('@')[0];document.getElementById('greetName').textContent=name.split(' ')[0];updateProfileUI(data);loadAllData()}
+
+function updateProfileUI(data){const name=data.name||currentUser.email.split('@')[0];const email=data.email||currentUser.email;const role=isSuperAdmin?'⭐ Super Admin':isAdmin?'🛡️ Admin':'🔵 User';document.getElementById('profileHeroName').textContent=name;document.getElementById('profileHeroEmail').textContent=email;document.getElementById('profileHeroBadge').textContent=role;document.getElementById('pfName').value=name;document.getElementById('pfUsername').value=data.username||'';document.getElementById('pfEmail').value=email;const initial=name.charAt(0).toUpperCase();document.getElementById('profileAvatarHero').textContent=initial;document.getElementById('pfAvatarInitial').textContent=initial;if(data.photoURL){document.getElementById('profileAvatarHero').style.backgroundImage=`url(${data.photoURL})`;document.getElementById('profileAvatarHero').style.backgroundSize='cover';document.getElementById('profileAvatarHero').textContent='';const img=document.getElementById('pfAvatarImg');img.src=data.photoURL;img.style.display='block';document.getElementById('pfAvatarInitial').style.display='none'}updateProfileStats()}
+
+function updateProfileStats(){const txArr=Object.values(transactions);const bizArr=Object.values(businessTx);const totalRec=txArr.filter(t=>t.type==='received').reduce((a,b)=>a+Number(b.amount),0);const totalSent=txArr.filter(t=>t.type==='sent').reduce((a,b)=>a+Number(b.amount),0);const totalInvested=bizArr.reduce((a,b)=>a+Number(b.invested),0);const totalProfit=bizArr.filter(b=>b.pnlType==='profit').reduce((a,b)=>a+Number(b.pnl),0);const totalLoss=bizArr.filter(b=>b.pnlType==='loss').reduce((a,b)=>a+Number(b.pnl),0);const el=document.getElementById('profileStats');if(!el)return;el.innerHTML=`
+<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2)">Total Transactions</span><span style="font-weight:700">${txArr.length}</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2)">Received from Clients</span><span style="font-weight:700;color:var(--emerald)">₹${fmtNum(totalRec)}</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2)">Sent Back to Clients</span><span style="font-weight:700;color:var(--red)">₹${fmtNum(totalSent)}</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text2)">Total Invested</span><span style="font-weight:700;color:var(--accent)">₹${fmtNum(totalInvested)}</span></div>
+<div style="display:flex;justify-content:space-between;padding:10px 0"><span style="font-size:13px;color:var(--text2)">Net P&L</span><span style="font-weight:700;color:${totalProfit>=totalLoss?'var(--emerald)':'var(--red)'}">₹${fmtNum(Math.abs(totalProfit-totalLoss))}</span></div>
+<div style="margin-top:12px;font-size:12px;color:var(--text3)">Role: ${isSuperAdmin?'Super Admin':isAdmin?'Admin':'User'}</div>`}
+
+window.stopVisiting=function(){sessionStorage.removeItem('admin_impersonate');window.location.reload()};
+
+function loadAllData(){const imp=sessionStorage.getItem('admin_impersonate');if(imp&&isSuperAdmin){document.getElementById('topbarTitle').innerHTML=`<div style="display:flex;align-items:center;gap:12px"><span style="color:var(--amber);font-size:15px">👀 Visiting as: ${imp}</span><button class="btn btn-sm" style="background:transparent;border:1.5px solid var(--amber);color:var(--amber);cursor:pointer" onclick="stopVisiting()">Exit</button></div>`}
+onValue(ref(db,'persons'),s=>{rawPersons=s.val()||{};computePersons()});
+onValue(ref(db,'users'),s=>{allUsers=s.val()||{};computePersons();renderUsersDirectory();if(isAdmin)renderAdminPanel()});
+onValue(ref(db,'transactions'),s=>{let allTx=s.val()||{};const imp=sessionStorage.getItem('admin_impersonate');if(imp&&isSuperAdmin){const f={};for(const k in allTx)if(allTx[k].admin===imp)f[k]=allTx[k];transactions=f}else transactions=allTx;renderTxTable();updateDashboard();updateStatistics();updateProfileStats()});
+onValue(ref(db,'business'),s=>{let allBiz=s.val()||{};const imp=sessionStorage.getItem('admin_impersonate');if(imp&&isSuperAdmin){const f={};for(const k in allBiz)if(allBiz[k].admin===imp||allBiz[k].investor===imp)f[k]=allBiz[k];businessTx=f}else businessTx=allBiz;renderBizTable();updateDashboard();updateStatistics();updateProfileStats()})}
+
+function computePersons(){persons={...rawPersons};for(const uid in allUsers){const u=allUsers[uid];if(u.role==='client')persons[uid]={name:u.name,contact:'Registered Client',email:u.email,photoURL:u.photoURL,isClientAccount:true}}renderPersons();populateTxPersonSelect()}
+
+function renderUsersDirectory(){const grid=document.getElementById('usersDirectoryGrid');if(!grid)return;const keys=Object.keys(allUsers);if(!keys.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👤</div><p>No users found.</p></div>';return}
+grid.innerHTML=keys.map(uid=>{const u=allUsers[uid];const initial=u.name?u.name.charAt(0).toUpperCase():'?';const av=u.photoURL?`<img src="${u.photoURL}" style="width:100%;height:100%;object-fit:cover">`:initial;let badge='<span class="badge" style="background:var(--surface2);color:var(--text2)">Staff</span>';if(u.role==='superadmin')badge='<span class="badge badge-amber">⭐ Super Admin</span>';else if(u.role==='admin')badge='<span class="badge badge-blue">🛡️ Admin</span>';else if(u.role==='client')badge='<span class="badge badge-green">👤 Client</span>';
+const btn=isAdmin?`<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px"><button class="btn btn-secondary btn-sm" style="width:100%" onclick="viewUserProfile('${uid}')">View Profile</button></div>`:'';
+return`<div class="card"><div style="display:flex;align-items:center;gap:14px"><div class="person-avatar">${av}</div><div style="min-width:0"><div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap">${u.name||'Unknown'} ${badge}</div><div style="font-size:13px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email}</div></div></div>${btn}</div>`}).join('')}
+
+window.viewUserProfile=function(uid){if(!isAdmin)return;const user=allUsers[uid];if(!user)return;const h=document.getElementById('userProfileHeader');const b=document.getElementById('userProfileBody');const initial=user.name?user.name.charAt(0).toUpperCase():'?';const av=user.photoURL?`<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover">`
+:initial;h.innerHTML=`<div class="person-avatar" style="width:56px;height:56px;font-size:22px">${av}</div><div><div style="font-size:20px;font-weight:700;font-family:'Space Grotesk',sans-serif">${user.name||'No Name'}</div><div style="font-size:13px;color:var(--text3)">${user.email||''}</div></div>`;let html='';for(const[k,v]of Object.entries(user)){if(k==='photoURL')continue;html+=`<div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;gap:16px"><div style="font-weight:700;color:var(--text2);text-transform:capitalize;min-width:120px">${k.replace(/_/g,' ')}</div><div style="color:var(--text);font-weight:500;text-align:right;word-break:break-all">${typeof v==='object'?JSON.stringify(v):v}</div></div>`}b.innerHTML=html;openModal('modalUserProfile')};
+
+// Auth actions
+window.switchAuthTab=function(tab){document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));document.getElementById('loginForm').style.display=tab==='login'?'block':'none';document.getElementById('registerForm').style.display=tab==='register'?'block':'none';document.getElementById('forgotForm').style.display='none'};
+window.showForgotPassword=function(){document.getElementById('loginForm').style.display='none';document.getElementById('forgotForm').style.display='block'};
+window.showLogin=function(){document.getElementById('loginForm').style.display='block';document.getElementById('forgotForm').style.display='none'};
+window.doLogin=async function(){const raw=document.getElementById('loginEmail').value.trim();const pass=document.getElementById('loginPassword').value;if(!raw||!pass)return showToast('Please fill all fields','error');try{let email=raw;if(!raw.includes('@')){const snap=await get(ref(db,'users'));const all=snap.val()||{};const found=Object.values(all).find(u=>u.username===raw);if(found)email=found.email;else return showToast('User not found','error')}await signInWithEmailAndPassword(auth,email,pass);showToast('Welcome back! 🎉','success')}catch(e){showToast(e.message.replace('Firebase:','').trim(),'error')}};
+window.doResetPassword=async function(){const email=document.getElementById('resetEmail').value.trim();if(!email)return showToast('Enter your email','error');try{await sendPasswordResetEmail(auth,email);showToast('Reset link sent!','success');showLogin()}catch(e){showToast(e.message,'error')}};
+window.doRegister=async function(){const name=document.getElementById('regName').value.trim();const username=document.getElementById('regUsername').value.trim();const email=document.getElementById('regEmail').value.trim();const pass=document.getElementById('regPassword').value;const conf=document.getElementById('regConfirm').value;const ap=document.getElementById('avatarPreview');if(!ap.src||ap.style.display==='none')return showToast('Profile photo is mandatory!','error');if(!name||!username||!email||!pass)return showToast('Please fill all fields','error');if(pass!==conf)return showToast('Passwords do not match','error');if(pass.length<6)return showToast('Password must be at least 6 characters','error');try{const cred=await createUserWithEmailAndPassword(auth,email,pass);const role=email===SUPER_ADMIN?'superadmin':'user';const photoURL=await compressImage(ap.src,400,0.7);await set(ref(db,`users/${cred.user.uid}`),{name,username,email,role,photoURL,createdAt:Date.now()});showToast('Account created! 🎉','success')}catch(e){showToast(e.message.replace('Firebase:','').trim(),'error')}};
+window.doLogout=async function(){await signOut(auth);document.body.classList.remove('is-admin');sessionStorage.removeItem('admin_impersonate');showToast('Signed out','info')};
+
+// Navigation
+window.navigate=function(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const el=document.getElementById(`page-${page}`);if(el)el.classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes(`'${page}'`))n.classList.add('active')});const titles={dashboard:'Dashboard',statistics:'Analytics',persons:'Persons',transactions:'Transactions',business:'Business',profile:'Profile',admin:'Admin Panel',users:'System Users'};const imp=sessionStorage.getItem('admin_impersonate');if(!imp)document.getElementById('topbarTitle').textContent=titles[page]||page;if(window.innerWidth<700)closeSidebar();if(page==='statistics')setTimeout(renderCharts,100);if(page==='dashboard')setTimeout(renderDashCharts,100);if(page==='admin')renderAdminPanel()};
+window.toggleSidebar=function(){document.getElementById('sidebar').classList.toggle('mobile-open');document.getElementById('overlaySidebar').classList.toggle('active')};
+window.closeSidebar=function(){document.getElementById('sidebar').classList.remove('mobile-open');document.getElementById('overlaySidebar').classList.remove('active')};
+
+// Persons
+window.openAddPerson=function(){if(!isAdmin)return showToast('Permission denied.','error');editingPersonKey=null;['pName','pContact','pEmail','pNote'].forEach(id=>document.getElementById(id).value='');openModal('modalPerson')};
+window.savePerson=async function(){if(!isAdmin)return showToast('Permission denied.','error');const name=document.getElementById('pName').value.trim();const contact=document.getElementById('pContact').value.trim();const email=document.getElementById('pEmail').value.trim();const note=document.getElementById('pNote').value.trim();if(!name||!contact)return showToast('Name and contact required','error');const data={name,contact,email,note,createdAt:Date.now(),createdBy:currentUser.uid};if(editingPersonKey){await update(ref(db,`persons/${editingPersonKey}`),data);showToast('Person updated','success')}else{await push(ref(db,'persons'),data);showToast('Person added','success')}closeModal('modalPerson')};
+window.editPerson=function(key){if(!isAdmin)return;const p=persons[key];editingPersonKey=key;document.getElementById('pName').value=p.name||'';document.getElementById('pContact').value=p.contact||'';document.getElementById('pEmail').value=p.email||'';document.getElementById('pNote').value=p.note||'';openModal('modalPerson')};
+window.deletePerson=async function(key){if(!isAdmin)return;if(!confirm('Delete this person?'))return;await remove(ref(db,`persons/${key}`));showToast('Person removed','success')};
+
+function renderPersons(){const grid=document.getElementById('personGrid');const keys=Object.keys(persons);if(!keys.length){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👤</div><p>No persons added yet</p></div>';return}
+grid.innerHTML=keys.map(k=>{const p=persons[k];const initial=p.name?p.name.charAt(0).toUpperCase():'?';const av=p.photoURL?`<img src="${p.photoURL}" style="width:100%;height:100%;object-fit:cover">`
+:initial;const btns=isAdmin&&!p.isClientAccount?`<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-secondary btn-sm" onclick="editPerson('${k}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deletePerson('${k}')">Delete</button></div>`:(p.isClientAccount?'<div style="margin-top:12px"><span class="badge badge-green">Linked Client</span></div>':'');
+return`<div class="person-card" style="flex-direction:column;align-items:flex-start"><div style="display:flex;align-items:center;gap:14px;width:100%"><div class="person-avatar">${av}</div><div class="person-info"><div class="person-name">${p.name}</div><div class="person-contact">📞 ${p.contact}</div>${p.email?`<div class="person-contact" style="margin-top:2px">✉️ ${p.email}</div>`:''}${p.note?`<div class="person-contact" style="margin-top:2px;font-style:italic">"${p.note}"</div>`:''}</div></div>${btns}</div>`}).join('')}
+
+function populateTxPersonSelect(){const sel=document.getElementById('txPerson');if(!sel)return;sel.innerHTML='<option value="">— Select Person —</option>'+Object.keys(persons).map(k=>`<option value="${k}">${persons[k].name}</option>`).join('')}
+
+// Transactions
+window.openAddTx=function(){if(!isAdmin)return showToast('Permission denied.','error');editingTxKey=null;document.getElementById('txModalTitle').textContent='New Transaction';const now=new Date();document.getElementById('txDate').value=now.toISOString().split('T')[0];document.getElementById('txTime').value=now.toTimeString().slice(0,5);document.getElementById('txAmount').value='';document.getElementById('txNote').value='';document.getElementById('txType').value='received';const inp=document.getElementById('txScreenshotInput');if(inp)inp.value='';const prev=document.getElementById('txScreenshotPreview');if(prev){prev.src='';prev.style.display='none'}populateTxPersonSelect();openModal('modalTx')};
+window.saveTx=async function(){if(!isAdmin)return;const type=document.getElementById('txType').value;const amount=document.getElementById('txAmount').value;const personKey=document.getElementById('txPerson').value;const date=document.getElementById('txDate').value;const time=document.getElementById('txTime').value;const note=document.getElementById('txNote').value.trim();if(!amount||!personKey||!date||!time)return showToast('Please fill required fields','error');const btn=document.getElementById('txSaveBtn');btn.textContent='Saving...';btn.disabled=true;try{let screenshotURL=editingTxKey&&transactions[editingTxKey].screenshotURL?transactions[editingTxKey].screenshotURL:'';const prevSrc=document.getElementById('txScreenshotPreview').src;if(prevSrc&&prevSrc.startsWith('data:image'))screenshotURL=await compressImage(prevSrc,1024,0.75);const data={type,amount:Number(amount),personKey,personName:persons[personKey]?.name||'',date,time,note,screenshotURL,admin:currentUser.email,createdAt:editingTxKey?transactions[editingTxKey].createdAt:Date.now()};if(editingTxKey){await update(ref(db,`transactions/${editingTxKey}`),data);showToast('Transaction updated','success')}else{await push(ref(db,'transactions'),data);showToast('Transaction saved','success')}closeModal('modalTx')}catch(e){showToast(e.message,'error')}finally{btn.textContent='Save Transaction';btn.disabled=false}};
+window.editTx=function(key){if(!isAdmin)return;const t=transactions[key];editingTxKey=key;document.getElementById('txModalTitle').textContent='Edit Transaction';document.getElementById('txType').value=t.type;document.getElementById('txAmount').value=t.amount;document.getElementById('txDate').value=t.date;document.getElementById('txTime').value=t.time;document.getElementById('txNote').value=t.note||'';populateTxPersonSelect();document.getElementById('txPerson').value=t.personKey;const inp=document.getElementById('txScreenshotInput');if(inp)inp.value='';const prev=document.getElementById('txScreenshotPreview');if(t.screenshotURL){prev.src=t.screenshotURL;prev.style.display='block'}else{prev.src='';prev.style.display='none'}openModal('modalTx')};
+window.deleteTx=async function(key){if(!isAdmin)return;if(!confirm('Delete this transaction?'))return;await remove(ref(db,`transactions/${key}`));showToast('Transaction deleted','success')};
+window.previewTxScreenshot=function(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const img=document.getElementById('txScreenshotPreview');img.src=e.target.result;img.style.display='block'};reader.readAsDataURL(file)};
+
+function renderTxTable(){const tbody=document.getElementById('txTableBody');if(!tbody)return;const keys=Object.keys(transactions).sort((a,b)=>transactions[b].createdAt-transactions[a].createdAt);if(!keys.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px"><div style="font-size:28px;margin-bottom:8px;animation:float 3s ease-in-out infinite">📭</div>No transactions yet</td></tr>';return}
+tbody.innerHTML=keys.map(k=>{const t=transactions[k];const badge=t.type==='received'?'<span class="badge badge-green">📥 Received</span>':'<span class="badge badge-red">📤 Sent Back</span>';const btns=isAdmin?`<div style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm" onclick="editTx('${k}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteTx('${k}')">Del</button></div>`:'—';const ss=t.screenshotURL?`<a href="${t.screenshotURL}" target="_blank"><img src="${t.screenshotURL}" style="width:40px;height:40px;object-fit:cover;border-radius:var(--radius-xs);border:2px solid var(--border)" onerror="this.outerHTML='<span style=color:var(--red);font-size:12px>⚠</span>'"/></a>`:'<span style="color:var(--text3)">—</span>';
+return`<tr><td><div style="font-weight:600;font-size:13px">${t.date}</div><div style="color:var(--text3);font-size:11px;margin-top:2px">${t.time}</div></td><td style="font-weight:600">${t.personName}</td><td>${badge}</td><td style="font-weight:700;color:${t.type==='received'?'var(--emerald)':'var(--red)'}">₹${fmtNum(t.amount)}</td><td style="color:var(--text3);font-size:13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.note||'—'}</td><td>${ss}</td><td>${btns}</td></tr>`}).join('')}
+
+// Business
+window.openAddBusiness=function(){if(!isAdmin)return;editingBizKey=null;document.getElementById('bizModalTitle').textContent='New Business Entry';const now=new Date();document.getElementById('bizDate').value=now.toISOString().split('T')[0];document.getElementById('bizTime').value=now.toTimeString().slice(0,5);document.getElementById('bizInvested').value='';document.getElementById('bizPnl').value='';document.getElementById('bizNote').value='';document.getElementById('bizInvestor').value=currentUser.displayName||currentUser.email;document.getElementById('bizPnlType').value='profit';openModal('modalBiz')};
+window.saveBiz=async function(){if(!isAdmin)return;const invested=document.getElementById('bizInvested').value;const pnlType=document.getElementById('bizPnlType').value;const pnl=document.getElementById('bizPnl').value;const date=document.getElementById('bizDate').value;const time=document.getElementById('bizTime').value;const note=document.getElementById('bizNote').value.trim();const investor=document.getElementById('bizInvestor').value;if(!invested||!pnl||!date||!time)return showToast('Please fill required fields','error');const data={invested:Number(invested),pnlType,pnl:Number(pnl),date,time,note,investor,admin:currentUser.email,createdAt:Date.now()};if(editingBizKey){await update(ref(db,`business/${editingBizKey}`),data);showToast('Entry updated','success')}else{await push(ref(db,'business'),data);showToast('Business entry saved','success')}closeModal('modalBiz')};
+window.editBiz=function(key){if(!isAdmin)return;const b=businessTx[key];editingBizKey=key;document.getElementById('bizModalTitle').textContent='Edit Business Entry';document.getElementById('bizInvested').value=b.invested;document.getElementById('bizPnlType').value=b.pnlType;document.getElementById('bizPnl').value=b.pnl;document.getElementById('bizDate').value=b.date;document.getElementById('bizTime').value=b.time;document.getElementById('bizNote').value=b.note||'';document.getElementById('bizInvestor').value=b.investor||'';openModal('modalBiz')};
+window.deleteBiz=async function(key){if(!isAdmin)return;if(!confirm('Delete this entry?'))return;await remove(ref(db,`business/${key}`));showToast('Entry deleted','success')};
+
+function renderBizTable(){const tbody=document.getElementById('bizTableBody');if(!tbody)return;const keys=Object.keys(businessTx).sort((a,b)=>businessTx[b].createdAt-businessTx[a].createdAt);if(!keys.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px"><div style="font-size:28px;margin-bottom:8px;animation:float 3s ease-in-out infinite">💼</div>No business entries yet</td></tr>';return}
+tbody.innerHTML=keys.map(k=>{const b=businessTx[k];const badge=b.pnlType==='profit'?'<span class="badge badge-green">📈 Profit</span>':'<span class="badge badge-red">📉 Loss</span>';const btns=isAdmin?`<div style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm" onclick="editBiz('${k}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteBiz('${k}')">Del</button></div>`:'—';
+return`<tr><td><div style="font-weight:600;font-size:13px">${b.date}</div><div style="color:var(--text3);font-size:11px;margin-top:2px">${b.time}</div></td><td style="font-weight:700">₹${fmtNum(b.invested)}</td><td style="font-weight:700;color:${b.pnlType==='profit'?'var(--emerald)':'var(--red)'}">₹${fmtNum(b.pnl)}</td><td>${badge}</td><td style="font-size:13px">${b.investor||'—'}</td><td style="color:var(--text3);font-size:13px">${b.note||'—'}</td><td>${btns}</td></tr>`}).join('')}
+
+// Dashboard
+function updateDashboard(){const txArr=Object.values(transactions);const bizArr=Object.values(businessTx);const rec=txArr.filter(t=>t.type==='received');const sent=txArr.filter(t=>t.type==='sent');const totalReceived=rec.reduce((a,b)=>a+Number(b.amount),0);const paybackDue=rec.reduce((a,b)=>a+Number(b.amount)+200,0);const totalSentBack=sent.reduce((a,b)=>a+Number(b.amount),0);const pendingPayback=Math.max(0,paybackDue-totalSentBack);
+document.getElementById('statReceived').textContent=`₹${fmtNum(totalReceived)}`;document.getElementById('statPaybackDue').textContent=`₹${fmtNum(paybackDue)}`;document.getElementById('statSentBack').textContent=`₹${fmtNum(totalSentBack)}`;document.getElementById('statPending').textContent=`₹${fmtNum(pendingPayback)}`;
+const pc=document.getElementById('statPendingChg');if(pendingPayback>0){pc.textContent='⚠ Still owe clients';pc.className='stat-change down'}else if(paybackDue>0){pc.textContent='✅ All settled!';pc.className='stat-change up'}else pc.textContent='No payments yet';
+const totalInvested=bizArr.reduce((a,b)=>a+Number(b.invested),0);const totalProfit=bizArr.filter(b=>b.pnlType==='profit').reduce((a,b)=>a+Number(b.pnl),0);const totalLoss=bizArr.filter(b=>b.pnlType==='loss').reduce((a,b)=>a+Number(b.pnl),0);const netPnl=totalProfit-totalLoss;
+document.getElementById('statInvested').textContent=`₹${fmtNum(totalInvested)}`;document.getElementById('statProfit').textContent=`₹${fmtNum(totalProfit)}`;document.getElementById('statLoss').textContent=`₹${fmtNum(totalLoss)}`;document.getElementById('statPnl').textContent=`₹${fmtNum(Math.abs(netPnl))}`;
+const pnlEl=document.getElementById('statPnlChg');pnlEl.textContent=netPnl>=0?'↑ Net Profit':'↓ Net Loss';pnlEl.className=`stat-change ${netPnl>=0?'up':'down'}`;
+
+const sorted=Object.keys(transactions).sort((a,b)=>transactions[b].createdAt-transactions[a].createdAt).slice(0,5);const listEl=document.getElementById('recentTxList');if(listEl){if(!sorted.length){listEl.innerHTML='<div class="empty-state" style="padding:20px"><div class="empty-icon">📋</div><p>No transactions yet</p></div>';return}
+listEl.innerHTML=sorted.map(k=>{const t=transactions[k];const isRec=t.type==='received';return`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div><div style="font-weight:700;font-size:14px">${t.personName}</div><div style="font-size:12px;color:var(--text3);margin-top:2px">${t.date} · ${isRec?'Client paid':'Sent back'}</div></div><div style="font-weight:700;font-size:15px;color:${isRec?'var(--emerald)':'var(--red)'}; font-family:'Space Grotesk',sans-serif">${isRec?'+':'-'}₹${fmtNum(t.amount)}</div></div>`}).join('')}}
+
+let dashFlowChartObj=null;
+function renderDashCharts(){const txArr=Object.values(transactions);const labels=[],sentData=[],recData=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];labels.push(ds.slice(5));sentData.push(txArr.filter(t=>t.date===ds&&t.type==='sent').reduce((a,b)=>a+Number(b.amount),0));recData.push(txArr.filter(t=>t.date===ds&&t.type==='received').reduce((a,b)=>a+Number(b.amount),0))}
+const ctx=document.getElementById('dashFlowChart');if(!ctx)return;if(dashFlowChartObj)dashFlowChartObj.destroy();dashFlowChartObj=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'Received',data:recData,backgroundColor:'rgba(5,150,105,.7)',borderRadius:8},{label:'Sent Back',data:sentData,backgroundColor:'rgba(220,38,38,.7)',borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,pointStyle:'circle',font:{family:"'Plus Jakarta Sans',sans-serif",weight:'600',size:12}}}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,.04)'}}}}})}
+
+// Statistics
+let chartObjs={};
+function updateStatistics(){const bizArr=Object.values(businessTx);const txArr=Object.values(transactions);const totalInvested=bizArr.reduce((a,b)=>a+Number(b.invested),0);const totalProfit=bizArr.filter(b=>b.pnlType==='profit').reduce((a,b)=>a+Number(b.pnl),0);const totalLoss=bizArr.filter(b=>b.pnlType==='loss').reduce((a,b)=>a+Number(b.pnl),0);const netPnl=totalProfit-totalLoss;const roi=totalInvested>0?((netPnl/totalInvested)*100).toFixed(1):0;
+const sc=document.getElementById('statsCards');if(sc)sc.innerHTML=`
+<div class="stat-card blue"><div class="bg-blob"></div><div class="stat-icon-box blue">💼</div><div class="stat-label">Total Invested</div><div class="stat-value">₹${fmtNum(totalInvested)}</div><div class="stat-change" style="color:var(--accent)">Business capital</div></div>
+<div class="stat-card green"><div class="bg-blob"></div><div class="stat-icon-box green">📈</div><div class="stat-label">Total Profit</div><div class="stat-value">₹${fmtNum(totalProfit)}</div><div class="stat-change up">From investments</div></div>
+<div class="stat-card red"><div class="bg-blob"></div><div class="stat-icon-box red">📉</div><div class="stat-label">Total Loss</div><div class="stat-value">₹${fmtNum(totalLoss)}</div><div class="stat-change down">From investments</div></div>
+<div class="stat-card amber"><div class="bg-blob"></div><div class="stat-icon-box amber">🎯</div><div class="stat-label">ROI</div><div class="stat-value">${roi}%</div><div class="stat-change ${Number(roi)>=0?'up':'down'}">${Number(roi)>=0?'↑ Positive':'↓ Negative'} ROI</div></div>`}
+
+function renderCharts(){const txArr=Object.values(transactions);const bizArr=Object.values(businessTx);
+const months=[],recData=[],sentData=[];for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);const ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;months.push(d.toLocaleString('default',{month:'short'}));recData.push(txArr.filter(t=>t.date&&t.date.startsWith(ym)&&t.type==='received').reduce((a,b)=>a+Number(b.amount),0));sentData.push(txArr.filter(t=>t.date&&t.date.startsWith(ym)&&t.type==='sent').reduce((a,b)=>a+Number(b.amount),0))}
+destroyChart('revenueChart');chartObjs['revenueChart']=new Chart(document.getElementById('revenueChart'),{type:'line',data:{labels:months,datasets:[{label:'Received',data:recData,borderColor:'#059669',backgroundColor:'rgba(5,150,105,.08)',fill:true,tension:.4,pointBackgroundColor:'#059669',pointRadius:4,pointBorderColor:'#fff',pointBorderWidth:2,borderWidth:2.5},{label:'Sent Back',data:sentData,borderColor:'#dc2626',backgroundColor:'rgba(220,38,38,.08)',fill:true,tension:.4,pointBackgroundColor:'#dc2626',pointRadius:4,pointBorderColor:'#fff',pointBorderWidth:2,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,pointStyle:'circle',font:{family:"'Plus Jakarta Sans',sans-serif",weight:'600',size:12}}}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,.04)'}}}}});
+
+const totalReceived=txArr.filter(t=>t.type==='received').reduce((a,b)=>a+Number(b.amount),0);const totalSentBack=txArr.filter(t=>t.type==='sent').reduce((a,b)=>a+Number(b.amount),0);const totalInvested=bizArr.reduce((a,b)=>a+Number(b.invested),0);const totalProfit=bizArr.filter(b=>b.pnlType==='profit').reduce((a,b)=>a+Number(b.pnl),0);const totalLoss=bizArr.filter(b=>b.pnlType==='loss').reduce((a,b)=>a+Number(b.pnl),0);
+destroyChart('portfolioChart');chartObjs['portfolioChart']=new Chart(document.getElementById('portfolioChart'),{type:'doughnut',data:{labels:['Client Payments','Paybacks','Invested','Profit','Loss'],datasets:[{data:[totalReceived||1,totalSentBack||1,totalInvested||1,totalProfit||1,totalLoss||1],backgroundColor:['#059669','#dc2626','#4f46e5','#d97706','#7f1d1d'],borderWidth:4,borderColor:'#ffffff',hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:14,font:{family:"'Plus Jakarta Sans',sans-serif",weight:'600',size:12}}}}}});
+
+const bizSorted=[...bizArr].sort((a,b)=>a.createdAt-b.createdAt);let cumROI=0,cumInvested=0,roiData=[],roiLabels=[];bizSorted.forEach((b,i)=>{cumInvested+=Number(b.invested);cumROI+=b.pnlType==='profit'?Number(b.pnl):-Number(b.pnl);roiData.push(parseFloat((cumInvested>0?(cumROI/cumInvested)*100:0).toFixed(2)));roiLabels.push(`#${i+1}`)});if(!roiData.length){roiData=[0];roiLabels=['—']}
+destroyChart('investChart');chartObjs['investChart']=new Chart(document.getElementById('investChart'),{type:'line',data:{labels:roiLabels,datasets:[{label:'Cumulative ROI (%)',data:roiData,borderColor:'#4f46e5',backgroundColor:'rgba(79,70,229,.07)',fill:true,tension:.4,pointBackgroundColor:'#4f46e5',pointRadius:4,pointBorderColor:'#fff',pointBorderWidth:2,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{family:"'Plus Jakarta Sans',sans-serif",weight:'600',size:12}}}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,.04)'}}}}});
+
+const volLabels=[],volData=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];volLabels.push(ds.slice(5));volData.push(txArr.filter(t=>t.date===ds).reduce((a,b)=>a+Number(b.amount),0))}
+destroyChart('volumeChart');chartObjs['volumeChart']=new Chart(document.getElementById('volumeChart'),{type:'bar',data:{labels:volLabels,datasets:[{label:'Volume (₹)',data:volData,backgroundColor:volData.map(v=>v>0?'rgba(79,70,229,.7)':'rgba(200,200,200,.4)'),borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{family:"'Plus Jakarta Sans',sans-serif",weight:'600',size:12}}}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,.04)'}}}}});
+
+const netPnl=totalProfit-totalLoss;const wfLabels=['Invested','Profit','Loss','Net P&L'];const wfData=[-totalInvested,totalProfit,-totalLoss,netPnl];
+destroyChart('waterfallChart');chartObjs['waterfallChart']=new Chart(document.getElementById('waterfallChart'),{type:'bar',data:{labels:wfLabels,datasets:[{label:'₹',data:wfData,backgroundColor:wfData.map(v=>v>=0?'rgba(5,150,105,.75)':'rgba(220,38,38,.75)'),borderRadius:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(0,0,0,.04)'}}}}});
+renderRiskGauge()}
+
+function renderRiskGauge(){const bizArr=Object.values(businessTx);const totalInvested=bizArr.reduce((a,b)=>a+Number(b.invested),0);const totalProfit=bizArr.filter(b=>b.pnlType==='profit').reduce((a,b)=>a+Number(b.pnl),0);const totalLoss=bizArr.filter(b=>b.pnlType==='loss').reduce((a,b)=>a+Number(b.pnl),0);const netPnl=totalProfit-totalLoss;const lossEntries=bizArr.filter(b=>b.pnlType==='loss').length;const totalBiz=bizArr.length;
+const lir=totalInvested>0?Math.min(1,totalLoss/totalInvested):0;const lf=totalBiz>0?lossEntries/totalBiz:0;const ph=totalInvested>0?Math.max(0,Math.min(1,-netPnl/totalInvested)):0;const car=totalProfit>0?Math.min(1,totalLoss/totalProfit):(totalLoss>0?1:0);
+const riskScore=Math.min(100,Math.round(lir*30+lf*20+ph*30+car*20));const rl=riskScore<20?'Low Risk':riskScore<45?'Moderate':riskScore<70?'High Risk':'Critical';const rc=riskScore<20?'#10b981':riskScore<45?'#d97706':riskScore<70?'#dc2626':'#7f1d1d';
+const canvas=document.getElementById('riskGauge');if(!canvas)return;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,200,110);ctx.beginPath();ctx.arc(100,100,80,-Math.PI,0);ctx.strokeStyle='var(--border)';ctx.lineWidth=18;ctx.stroke();const angle=-Math.PI+(riskScore/100)*Math.PI;ctx.beginPath();ctx.arc(100,100,80,-Math.PI,angle);ctx.strokeStyle=rc;ctx.lineWidth=18;ctx.lineCap='round';ctx.stroke();
+document.getElementById('riskScore').textContent=`${rl} (${riskScore}/100)`;document.getElementById('riskScore').style.color=rc;
+
+const bd=document.getElementById('riskBreakdown');if(bd){const items=[{label:'Loss / Investment',val:Math.round(lir*100),color:'#dc2626'},{label:'Loss Frequency',val:Math.round(lf*100),color:'#d97706'},{label:'P&L Health',val:Math.round(ph*100),color:'#4f46e5'},{label:'Capital at Risk',val:Math.round(car*100),color:'#7f1d1d'}];bd.innerHTML=items.map(i=>`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px">${i.label}</span><span style="font-size:13px;font-weight:700">${i.val}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${i.val}%;background:${i.color}"></div></div></div>`).join('')}
+
+const ri=document.getElementById('riskIndicators');if(ri){const roi=totalInvested>0?((netPnl/totalInvested)*100):0;const inds=[{icon:'🟢',label:'Positive ROI',active:roi>0},{icon:'🟡',label:'Moderate Loss Rate',active:lf>0.2&&lf<=0.5},{icon:'🔴',label:'High Loss Rate (>50%)',active:lf>0.5},{icon:'⚠️',label:'Net Loss',active:netPnl<0},{icon:'✅',label:'All Profitable',active:totalBiz>0&&lossEntries===0},{icon:'📊',label:`ROI: ${roi.toFixed(1)}%`,active:totalBiz>0}];ri.innerHTML=inds.map(i=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);opacity:${i.active?1:0.3}"><span style="font-size:16px">${i.icon}</span><span style="font-size:13px;font-weight:${i.active?700:400}">${i.label}</span>${i.active?'<span class="badge badge-blue" style="margin-left:auto;font-size:10px">Active</span>':''}</div>`).join('')}}
+
+function destroyChart(id){if(chartObjs[id]){chartObjs[id].destroy();delete chartObjs[id]}}
+
+// Admin
+function renderAdminPanel(){if(!isAdmin)return;const ul=document.getElementById('adminUserList');const al=document.getElementById('adminAdminList');const arr=Object.entries(allUsers);const users=arr.filter(([,u])=>u.role==='user'||!u.role||u.role==='client');const admins=arr.filter(([,u])=>u.role==='admin'||u.role==='superadmin');
+if(ul)ul.innerHTML=users.length?users.map(([uid,u])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div><div style="font-weight:700;font-size:14px">${u.name||'Unknown'} ${u.role==='client'?'<span style="color:var(--emerald);font-size:11px">(Client)</span>':''}</div><div style="font-size:12px;color:var(--text3)">${u.email}</div></div><div style="display:flex;gap:6px">${u.email!==SUPER_ADMIN?`<button class="btn btn-secondary btn-sm" onclick="makeAdmin('${uid}')">Make Admin</button><button class="btn btn-danger btn-sm" onclick="removeUser('${uid}')">Remove</button>`:''}</div></div>`).join(''):'<div style="color:var(--text3);padding:16px 0">No regular users</div>';
+if(al)al.innerHTML=admins.length?admins.map(([uid,u])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)"><div><div style="font-weight:700;font-size:14px">${u.name||'Unknown'} ${u.role==='superadmin'?'⭐':''}</div><div style="font-size:12px;color:var(--text3)">${u.email}</div></div>${u.email!==SUPER_ADMIN&&isSuperAdmin?`<button class="btn btn-danger btn-sm" onclick="removeAdmin('${uid}')">Revoke</button>`:''}</div>`).join(''):'<div style="color:var(--text3);padding:16px 0">No admins yet</div>'}
+
+window.makeAdmin=async function(uid){if(!isSuperAdmin&&!isAdmin)return;await update(ref(db,`users/${uid}`),{role:'admin'});showToast('User promoted to Admin','success')};
+window.removeAdmin=async function(uid){if(!isSuperAdmin)return;await update(ref(db,`users/${uid}`),{role:'user'});showToast('Admin revoked','success')};
+window.removeUser=async function(uid){if(!isAdmin)return;if(!confirm('Remove this user?'))return;await remove(ref(db,`users/${uid}`));showToast('User removed','success')};
+
+// Profile
+window.saveProfile=async function(){const name=document.getElementById('pfName').value.trim();const username=document.getElementById('pfUsername').value.trim();const email=document.getElementById('pfEmail').value.trim();if(!name||!email)return showToast('Name and email required','error');await update(ref(db,`users/${currentUser.uid}`),{name,username,email});document.getElementById('profileHeroName').textContent=name;document.getElementById('greetName').textContent=name.split(' ')[0];showToast('Profile updated','success')};
+window.changePassword=async function(){const np=document.getElementById('pfNewPass').value;const cp=document.getElementById('pfConfPass').value;if(!np||!cp)return showToast('Fill both fields','error');if(np!==cp)return showToast('Passwords do not match','error');if(np.length<6)return showToast('Min 6 characters','error');try{await updatePassword(currentUser,np);showToast('Password updated!','success');document.getElementById('pfNewPass').value='';document.getElementById('pfConfPass').value=''}catch(e){showToast(e.message,'error')}};
+window.updateProfilePhoto=async function(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async e=>{const photoURL=await compressImage(e.target.result,400,0.7);await update(ref(db,`users/${currentUser.uid}`),{photoURL});const img=document.getElementById('pfAvatarImg');img.src=photoURL;img.style.display='block';document.getElementById('pfAvatarInitial').style.display='none';showToast('Photo updated!','success')};reader.readAsDataURL(file)};
+window.previewAvatar=function(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const img=document.getElementById('avatarPreview');img.src=e.target.result;img.style.display='block';document.getElementById('avatarPlaceholder').style.display='none'};reader.readAsDataURL(file)};
+
+// Modals
+window.openModal=function(id){document.getElementById(id).classList.add('open')};
+window.closeModal=function(id){document.getElementById(id).classList.remove('open')};
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')})});
+</script>
+</body>
+</html>
